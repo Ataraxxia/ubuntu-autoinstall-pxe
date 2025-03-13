@@ -1,0 +1,49 @@
+#cloud-config
+autoinstall:
+  version: 1
+  user-data:
+    users:
+    - name: myuser
+      passwd: "_PASSWORD_HASH_"
+      shell: /bin/bash
+      lock-passwd: false
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      groups: adm, sudo
+      ssh-authorized-keys:
+        - ssh-rsa _SSH_RSA_KEY_
+  locale: en_GB
+  keyboard:
+    layout: pl
+  timezone: Europe/Warsaw
+  ssh:
+    install-server: true
+    allow-pw: true
+    authorized-keys: []
+  storage:
+    grub:
+      reorder_uefi: false
+    layout:
+      name: lvm
+      match:
+        ssd: true
+        size: smallest
+  apt:
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64, i386]
+        uri: https://ftp.icm.edu.pl/pub/linux/ubuntu/
+      - arches: [amd64, i386]
+        uri: https://security.ubuntu.com/ubuntu/
+  packages:
+    - vim
+    - ubuntu-desktop-minimal
+    - virtualbox
+    - libreoffice
+  shutdown: reboot
+  late-commands:
+    - | # Use hostname from DHCP lease. Can't be used with identity section AT ALL
+      bash <<'EOF'
+        source <(cat /run/systemd/netif/leases/* | grep ^HOSTNAME=)
+        [[ -n "${HOSTNAME}" ]] && echo "${HOSTNAME}" > /target/etc/hostname
+      EOF
+      true

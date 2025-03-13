@@ -1,0 +1,17 @@
+#!ipxe
+
+menu Please choose an operating system to boot
+  item local                Local OS
+  item ubuntu24_autoinstall Ubuntu 24.04 Autoinstaller
+choose --default local --timeout 15000 target && goto ${target}
+
+
+# vmlinuz and initrd are taken from the ubuntu server ISO from 'casper' directory
+:ubuntu24_autoinstall
+kernel http://192.168.231.8/ubuntu24_srv/vmlinuz
+initrd http://192.168.231.8/ubuntu24_srv/initrd
+imgargs vmlinuz autoinstall ds=nocloud-net;s=http://192.168.231.8/autoinstall/ root=/dev/ram0 ramdisk_size=8388608 cloud-config-url=/dev/null url=http://192.168.231.8/ubuntu-24.04.2-live-server-amd64.iso ip=dhcp
+boot
+
+:local
+exit 1
